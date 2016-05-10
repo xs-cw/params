@@ -1,4 +1,4 @@
-package values
+package params
 
 import "reflect"
 
@@ -67,14 +67,12 @@ func (t *Value) parse(val reflect.Value) (err error) {
 		val.Set(reflect.MakeMap(typ))
 		ktyp := typ.Key()
 		vtyp := typ.Elem()
-		for _, i := range t.v.MapKeys() {
-			kk := reflect.New(ktyp).Elem()
-			vk := reflect.New(vtyp).Elem()
-			err = newValue(i).parse(kk)
+		for _, i := range t.Keys() {
+			kk, err := NewValue(i).convert(ktyp)
 			if err != nil {
 				continue
 			}
-			err = newValue(t.v.MapIndex(i)).parse(vk)
+			vk, err := t.Index(i).convert(vtyp)
 			if err != nil {
 				continue
 			}
@@ -90,7 +88,7 @@ func (t *Value) parse(val reflect.Value) (err error) {
 		for i := 0; i != val.NumField(); i++ {
 			fk := val.Field(i)
 			fname := typ.Field(i).Name
-			d := t.MapIndex(fname)
+			d := t.Index(fname)
 			d.parse(fk)
 		}
 	case reflect.Ptr:

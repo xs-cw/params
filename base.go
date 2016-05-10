@@ -1,53 +1,6 @@
-package values
+package params
 
-import (
-	encode "encoding/json"
-	"fmt"
-
-	"reflect"
-)
-
-func (t *Value) convert(typ reflect.Type) (ret reflect.Value, err error) {
-	defer func() {
-		if x := recover(); x != nil {
-			//ret = reflect.New(typ).Elem()
-			err = fmt.Errorf("value convert error: %v", x)
-		}
-	}()
-	if t.Type() == typ {
-		return t.v, nil
-	}
-	if t.Kind() == reflect.String && typ.Kind() != reflect.String {
-		v := reflect.New(typ)
-		var i interface{}
-		//		var t = encode.NewDecoder(bytes.NewBuffer([]byte(t.v.String())))
-		//		t.UseNumber()
-		//		t.Decode(&i)
-		encode.Unmarshal([]byte(t.v.String()), &i)
-		NewValue(i).parse(v)
-		return v.Elem(), nil
-	} else if t.v.Kind() != reflect.String && typ.Kind() == reflect.String {
-		b, _ := encode.Marshal(t.Interface())
-		return valueOf(string(b)), nil
-	}
-	//	else if (t.Kind() == reflect.Map && typ.Kind() != reflect.Map) || (t.Kind() != reflect.Map && typ.Kind() == reflect.Map) {
-	//		//		err = fmt.Errorf("value convert error: %v to %v", t.Kind(), typ.Kind())
-	//		//		return
-	//	}
-
-	return t.v.Convert(typ), nil
-}
-
-func (t *Value) MapIndex(k interface{}) *Value {
-	typ := t.v.Type()
-	kv := reflect.New(typ.Key())
-	NewValue(k).parse(kv)
-	return newValue(t.v.MapIndex(kv.Elem()))
-}
-
-func (t *Value) Index(i int) *Value {
-	return newValue(t.v.Index(i))
-}
+import "reflect"
 
 func (t *Value) Bool() bool {
 	var i bool
@@ -140,6 +93,77 @@ func (t *Value) Interface() interface{} {
 	return t.v.Interface()
 }
 
-func (t *Value) Len() int {
-	return t.v.Len()
+// 类型判断
+func (t *Value) IsValid() bool {
+	return t.v.IsValid()
+}
+
+func (t *Value) IsNil() bool {
+	return t.v.IsNil()
+}
+
+func (t *Value) IsString() bool {
+	return t.Kind() == reflect.String
+}
+
+func (t *Value) IsInt() bool {
+	switch t.Kind() {
+	case reflect.Int64, reflect.Int32, reflect.Int16, reflect.Int8, reflect.Int:
+		return true
+	}
+	return false
+}
+
+func (t *Value) IsUint() bool {
+	switch t.Kind() {
+	case reflect.Uint64, reflect.Uint32, reflect.Uint16, reflect.Uint8, reflect.Uint:
+		return true
+	}
+	return false
+}
+
+func (t *Value) IsFloat() bool {
+	switch t.Kind() {
+	case reflect.Float64, reflect.Float32:
+		return true
+	}
+	return false
+}
+
+func (t *Value) IsComplex() bool {
+	switch t.Kind() {
+	case reflect.Complex128, reflect.Complex64:
+		return true
+	}
+	return false
+}
+
+func (t *Value) IsArray() bool {
+	switch t.Kind() {
+	case reflect.Slice, reflect.Array:
+		return true
+	}
+	return false
+}
+
+func (t *Value) IsMap() bool {
+	return t.Kind() == reflect.Map
+}
+
+func (t *Value) IsBool() bool {
+	return t.Kind() == reflect.Bool
+}
+
+// 类型
+func (t *Value) Kind() reflect.Kind {
+	//t.elem()
+	return t.v.Kind()
+}
+
+func (t *Value) Type() reflect.Type {
+	//t.elem()
+	if !t.IsValid() {
+		return reflect.Type(nil)
+	}
+	return t.v.Type()
 }

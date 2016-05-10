@@ -1,6 +1,7 @@
-package values
+package params
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/wzshiming/ffmt"
@@ -8,6 +9,31 @@ import (
 
 type A struct {
 	Sss map[string]string
+}
+
+type TT struct {
+	A string
+	B int
+}
+
+func TestC(t *testing.T) {
+	var tt = map[string]string{}
+	v := NewValue(TT{"22", 11})
+	v.Parse(&tt)
+	fmt.Println(tt)
+}
+func TestB2(t *testing.T) {
+	var tt = []TT{}
+	v := NewValue(`[{"A":"222000000000000.5","B":50}]`)
+	v.Parse(&tt)
+	fmt.Println(tt)
+}
+
+func TestB(t *testing.T) {
+	var tt = map[string][]TT{}
+	v := NewValue(`{"dd":[{"A":"222000000000000.5","B":50}]}`)
+	v.Parse(&tt)
+	fmt.Println(tt)
 }
 
 func TestA(t *testing.T) {
@@ -22,9 +48,9 @@ func TestA(t *testing.T) {
 
 	v1 := NewValue(nil)
 	v1.Set(map[string]string{"Sss": `{"a":2220000000000000.5}`})
-	v1.SetMapIndex("22", 32323.5)
+	v1.SetIndex("22", 32323.5)
 
-	ffmt.Puts(v1.MapIndex(22).Float64())
+	ffmt.Puts(v1.Index(22).Float64())
 
 	var i1 = &map[int]int{}
 	v1.Parse(&i1)
