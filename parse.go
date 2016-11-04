@@ -39,6 +39,7 @@ func (t *Value) parse(val reflect.Value) (err error) {
 				return err
 			}
 		}
+
 		val.Set(reflect.MakeSlice(typ, t.Len(), t.Len()))
 		for i := 0; i != t.Len(); i++ {
 			t.Index(i).parse(val.Index(i))
@@ -64,7 +65,9 @@ func (t *Value) parse(val reflect.Value) (err error) {
 				return err
 			}
 		}
-		val.Set(reflect.MakeMap(typ))
+		if val.IsNil() {
+			val.Set(reflect.MakeMap(typ))
+		}
 		ktyp := typ.Key()
 		vtyp := typ.Elem()
 		for _, i := range t.Keys() {
@@ -92,7 +95,9 @@ func (t *Value) parse(val reflect.Value) (err error) {
 			d.parse(fk)
 		}
 	case reflect.Ptr:
-		val.Set(reflect.New(typ.Elem()))
+		if val.IsNil() {
+			val.Set(reflect.New(typ.Elem()))
+		}
 		err = t.parse(val.Elem())
 	default:
 		d, err := t.convert(val.Type())

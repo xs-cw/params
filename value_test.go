@@ -26,6 +26,8 @@ func TestB2(t *testing.T) {
 	var tt = []TT{}
 	v := NewValue(`[{"A":"222000000000000.5","B":50}]`)
 	v.Parse(&tt)
+	v = NewValue(`[{"C":"222000000000000.5","B":51}]`)
+	v.Parse(&tt)
 	fmt.Println(tt)
 }
 
