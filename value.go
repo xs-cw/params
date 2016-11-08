@@ -1,7 +1,7 @@
 package params
 
 import (
-	encode "encoding/json"
+	//encode "encoding/json"
 	"fmt"
 	"reflect"
 )
@@ -40,20 +40,29 @@ func (t *Value) convert(typ reflect.Type) (ret reflect.Value, err error) {
 	if t.Type() == typ {
 		return t.v, nil
 	}
-	if t.Kind() == reflect.String {
-		if typ.Kind() != reflect.String {
-			v := reflect.New(typ)
-			var i interface{}
-			encode.Unmarshal([]byte(t.v.String()), &i)
-			NewValue(i).parse(v)
-			return v.Elem(), nil
-		}
-	} else {
-		if typ.Kind() == reflect.String {
-			b, _ := encode.Marshal(t.Interface())
-			return valueOf(string(b)), nil
-		}
-	}
+
+	//	var tv interface{}
+	//	if typ == typeOf(tv) {
+	//		return t.v, nil
+	//	}
+	//	if t.Kind() == reflect.String {
+	//		if typ.Kind() != reflect.String {
+	//			v := reflect.New(typ)
+	//			var i interface{}
+	//			err := encode.Unmarshal([]byte(t.v.String()), &i)
+	//			if err != nil {
+	//				NewValue(i).parse(v)
+	//				return v.Elem(), nil
+	//			}
+	//		}
+	//	} else {
+	//		if typ.Kind() == reflect.String {
+	//			b, err := encode.Marshal(t.Interface())
+	//			if err != nil {
+	//				return valueOf(string(b)), nil
+	//			}
+	//		}
+	//	}
 	//	else if (t.Kind() == reflect.Map && typ.Kind() != reflect.Map) || (t.Kind() != reflect.Map && typ.Kind() == reflect.Map) {
 	//		//		err = fmt.Errorf("value convert error: %v to %v", t.Kind(), typ.Kind())
 	//		//		return
